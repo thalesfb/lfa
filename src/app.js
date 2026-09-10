@@ -26,6 +26,7 @@ const inputTape = document.querySelector("#input-tape");
 const historyBody = document.querySelector("#history-body");
 const transitionBody = document.querySelector("#transition-body");
 const diagram = document.querySelector("#automaton-diagram");
+const mobileTransitionBody = document.querySelector("#mobile-transition-body");
 const diagramCallout = document.querySelector("#diagram-callout");
 const transitionAnnouncement = document.querySelector("#transition-announcement");
 const coinButtons = [...document.querySelectorAll("[data-coin]")];
@@ -114,8 +115,10 @@ const renderDiagram = () => {
     const geometry = edgeGeometry(from, to, coins[0]);
     const active = transitionIsActive(from, to, coins);
     const label = coins.join(" · ");
+    const accessibleLabel = `${from} + ${coins.join(", ")} centavos para ${to}`;
     return `
-      <g class="diagram-edge ${active ? "is-active" : ""}" data-from="${from}" data-to="${to}" data-coins="${coins.join(",")}">
+      <g class="diagram-edge ${active ? "is-active" : ""}" data-from="${from}" data-to="${to}" data-coins="${coins.join(",")}" role="group" aria-label="${accessibleLabel}">
+        <title>${accessibleLabel}</title>
         <path d="${geometry.path}" marker-end="url(#arrow)" />
         <text x="${geometry.label.x}" y="${geometry.label.y}" text-anchor="middle">${label}</text>
       </g>
@@ -135,9 +138,13 @@ const renderDiagram = () => {
     `;
   }).join("");
 
+  const description = lastEvent
+    ? `Diagrama de estados. Estado atual ${machine.state}. Última transição: ${lastEvent.from} mais ${lastEvent.coin} centavos para ${lastEvent.to}.`
+    : `Diagrama de estados. Estado atual ${machine.state}. Transições acionadas por moedas de 5, 10 e 25 centavos.`;
+
   diagram.innerHTML = `
     <title id="diagram-title">Diagrama de estados da vending machine</title>
-    <desc id="diagram-description">Estados de q0 até q30+, com transições acionadas por moedas de 5, 10 e 25 centavos.</desc>
+    <desc id="diagram-description">${description}</desc>
     <defs>
       <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
         <path d="M 0 0 L 10 5 L 0 10 z" />
@@ -208,12 +215,14 @@ const renderHistory = () => {
 };
 
 const renderTransitionTable = () => {
-  transitionBody.innerHTML = STATES.map((state) => `
+  const rows = STATES.map((state) => `
     <tr class="${state === machine.state ? "is-current" : ""}">
       <th scope="row"><code>${state}</code></th>
       ${COINS.map((coin) => `<td>${transition(state, coin)}</td>`).join("")}
     </tr>
   `).join("");
+  transitionBody.innerHTML = rows;
+  mobileTransitionBody.innerHTML = rows;
 };
 
 const renderCallout = () => {

@@ -11,4 +11,7 @@ test("o diagrama ocupa uma seção própria e usa a largura disponível", async 
 
   assert.match(styles, /\.workspace\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/s);
   assert.match(styles, /\.vending-machine\s*\{[^}]*width:\s*min\(100%,\s*760px\)/s);
+  assert.match(styles, /\.diagram-mobile-fallback\s*\{[^}]*display:\s*none/);
+  assert.match(styles, /@media\s*\(max-width:\s*620px\)[\s\S]*?\.diagram-wrap\s*\{\s*display:\s*none;/);
+  assert.match(styles, /@media\s*\(max-width:\s*620px\)[\s\S]*?\.diagram-mobile-fallback\s*\{\s*display:\s*block;/);
 });

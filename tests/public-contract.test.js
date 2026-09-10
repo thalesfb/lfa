@@ -24,6 +24,16 @@ test("a interface pública apresenta os elementos essenciais de uma máquina de 
 
   assert.match(html, /Máquina de vendas/i);
   assert.match(html, /Como a máquina decide/i);
+  assert.match(html, /id="diagram-reading-guide"/);
+  assert.match(html, /id="diagram-mobile-fallback"/);
+  assert.match(html, /id="mobile-transition-body"/);
+  for (const marker of [
+    'id="transition-example-q0-5"',
+    'id="transition-example-q0-10"',
+    'id="transition-example-q0-25"',
+  ]) {
+    assert.match(html, new RegExp(marker.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&")), `exemplo ausente: ${marker}`);
+  }
 });
 
 test("a comunicação pública não expõe fluxo interno de revisão ou publicação", async () => {

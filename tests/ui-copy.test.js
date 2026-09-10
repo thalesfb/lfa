@@ -32,7 +32,7 @@ test("saldo insuficiente mantém a máquina disponível para novas moedas", () =
     {
       pillStatus: "rejected",
       pillLabel: "Saldo insuficiente",
-      screenNote: "Saldo insuficiente. Insira mais moedas para continuar.",
+      screenNote: "Tentativa rejeitada: saldo insuficiente. Insira mais moedas para continuar.",
       deliveryMessage: "Saldo insuficiente — insira mais moedas",
     },
   );

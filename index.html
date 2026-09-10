@@ -156,9 +156,53 @@
             </svg>
           </div>
 
+          <div class="diagram-mobile-fallback" id="diagram-mobile-fallback">
+            <div class="mobile-fallback-heading">
+              <p class="panel-kicker">visualização para telas estreitas</p>
+              <h3>As mesmas transições, sem cruzamento de setas</h3>
+            </div>
+            <div class="mobile-transition-table-wrap">
+              <table class="mobile-transition-table">
+                <caption class="visually-hidden">Tabela de transições para telas estreitas</caption>
+                <thead>
+                  <tr><th scope="col">estado</th><th scope="col">5¢</th><th scope="col">10¢</th><th scope="col">25¢</th></tr>
+                </thead>
+                <tbody id="mobile-transition-body"></tbody>
+              </table>
+            </div>
+          </div>
+
           <div class="diagram-callout" id="diagram-callout" aria-live="polite">
             <span class="callout-arrow">↳</span>
             <span>Escolha uma moeda para destacar a próxima transição.</span>
+          </div>
+          <div class="diagram-reading-guide" id="diagram-reading-guide" aria-label="Exemplos de leitura das transições">
+            <div class="guide-heading">
+              <div>
+                <p class="panel-kicker">leitura rápida</p>
+                <h3>Como ler as setas</h3>
+              </div>
+              <span>δ(estado, moeda) → próximo estado</span>
+            </div>
+            <div class="transition-examples">
+              <div class="transition-example" id="transition-example-q0-5">
+                <code>q0 + 5¢</code><span aria-hidden="true">→</span><strong>q5</strong>
+                <small>crédito acumulado: 5¢</small>
+              </div>
+              <div class="transition-example" id="transition-example-q0-10">
+                <code>q0 + 10¢</code><span aria-hidden="true">→</span><strong>q10</strong>
+                <small>crédito acumulado: 10¢</small>
+              </div>
+              <div class="transition-example" id="transition-example-q0-25">
+                <code>q0 + 25¢</code><span aria-hidden="true">→</span><strong>q25</strong>
+                <small>crédito acumulado: 25¢</small>
+              </div>
+            </div>
+            <p class="guide-note">
+              Cada estado tem uma saída para cada moeda de Σ = {5, 10, 25}. Quando moedas diferentes
+              chegam ao mesmo destino, seus rótulos são agrupados na mesma seta. Em <strong>q30+</strong>,
+              qualquer nova moeda mantém o autômato no estado final.
+            </p>
           </div>
           <p class="visually-hidden" id="transition-announcement" aria-live="polite" aria-atomic="true"></p>
         </article>

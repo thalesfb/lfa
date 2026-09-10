@@ -28,7 +28,7 @@ export const getStatusCopy = ({ inputLength, accepted, wordClosed, finishAttempt
     return {
       pillStatus: "rejected",
       pillLabel: "Saldo insuficiente",
-      screenNote: "Saldo insuficiente. Insira mais moedas para continuar.",
+      screenNote: "Tentativa rejeitada: saldo insuficiente. Insira mais moedas para continuar.",
       deliveryMessage: "Saldo insuficiente — insira mais moedas",
     };
   }
