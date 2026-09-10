@@ -111,9 +111,12 @@ rejeitada, mas a entrada continua aberta para que o usuário possa inserir outra
   legibilidade sem barra horizontal;
 - a tabela completa abaixo do simulador permite conferir toda a função `δ`.
 
-## Como testar localmente
+## Visualização e entrega
 
 É necessário ter Node.js instalado.
+
+O objeto principal do trabalho é a interface web publicada. O servidor local abaixo serve
+somente para visualizar e testar a aplicação durante o desenvolvimento:
 
 ```powershell
 npm test
@@ -125,7 +128,16 @@ Para abrir a interface:
 python -m http.server 4173
 ```
 
-Acesse <http://localhost:4173>.
+Acesse <http://localhost:4173> apenas como pré-visualização local.
+
+Para a entrega, o repositório deve ser publicado no GitHub e a raiz do projeto deve ser
+habilitada no GitHub Pages. Como o repositório é `thalesfb/lfa`, a URL esperada da página do
+projeto será:
+
+<https://thalesfb.github.io/lfa/>
+
+Essa página do GitHub Pages será a origem oficial da interface; `localhost` não é a URL de
+entrega.
 
 ### Roteiro manual
 
