@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - feat/trabalho-1-afd
   workflow_dispatch:
 
 permissions:
