@@ -1,5 +1,13 @@
 # VEND-30 — Trabalho 01 de LFA
 
+Simulador web de uma máquina de vendas modelada como um **autômato finito determinístico
+(AFD) reconhecedor**.
+
+[![CI](https://github.com/thalesfb/lfa/actions/workflows/ci.yml/badge.svg)](https://github.com/thalesfb/lfa/actions/workflows/ci.yml)
+[![Deploy GitHub Pages](https://github.com/thalesfb/lfa/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/thalesfb/lfa/actions/workflows/deploy-pages.yml)
+[![Demonstração](https://img.shields.io/badge/demo-GitHub%20Pages-0f766e?style=flat-square&logo=github)](https://thalesfb.github.io/lfa/)
+[![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-f0b429?style=flat-square)](LICENSE)
+
 Este repositório é, neste momento, exclusivo do Trabalho 01 de Linguagens Formais e
 Autômatos. A interface usa a metáfora de uma máquina de vendas, mas o objeto formal do
 trabalho é um **autômato finito determinístico (AFD) reconhecedor**.
@@ -113,33 +121,31 @@ rejeitada, mas a entrada continua aberta para que o usuário possa inserir outra
   legibilidade sem barra horizontal;
 - a tabela completa abaixo do simulador permite conferir toda a função `δ`.
 
-## Visualização e entrega
+## Desenvolvimento e entrega
 
 É necessário ter Node.js instalado.
 
-O objeto principal do trabalho é a interface web publicada. O servidor local abaixo serve
-somente para visualizar e testar a aplicação durante o desenvolvimento:
+### Teste local
+
+O servidor local serve somente para visualizar e testar a aplicação durante o desenvolvimento.
+Ele não representa a URL oficial da entrega.
 
 ```powershell
 npm test
-```
-
-Para abrir a interface:
-
-```powershell
 python -m http.server 4173
 ```
 
 Acesse <http://localhost:4173> apenas como pré-visualização local.
 
-Para a entrega, o repositório deve ser publicado no GitHub e a raiz do projeto deve ser
-habilitada no GitHub Pages. Como o repositório é `thalesfb/lfa`, a URL esperada da página do
-projeto será:
+### Demonstração publicada
+
+A interface oficial é publicada automaticamente pelo workflow do GitHub Pages após uma
+alteração na branch de entrega. Acesse:
 
 <https://thalesfb.github.io/lfa/>
 
-Essa página do GitHub Pages será a origem oficial da interface; `localhost` não é a URL de
-entrega.
+O workflow executa `npm test` antes de gerar o artefato estático. Se os testes falharem, a
+publicação não deve avançar.
 
 ### Roteiro manual
 
@@ -195,8 +201,3 @@ trabalho.
 3. O que se perde ao trocar a Máquina de Mealy do artigo por um AFD reconhecedor?
 4. Se o preço mudar para 35 centavos, quais estados e transições precisam ser alterados?
 5. O AFD poderia ser minimizado sem mudar a linguagem reconhecida?
-
-## Status
-
-A versão atual é local e testável. A publicação do repositório e da interface pertence à
-etapa posterior de entrega.
