@@ -1,4 +1,4 @@
-# Coin / Product — Trabalho 01 de LFA
+# VEND-30 — Trabalho 01 de LFA
 
 Simulador local de um **autômato finito determinístico (AFD)** inspirado no comportamento
 de uma vending machine. O projeto é um reconhecedor de palavras; ele não pretende modelar
@@ -80,14 +80,19 @@ local é recomendado porque a interface usa módulos JavaScript.
 - `src/app.js`: integração entre o autômato e a interface.
 - `src/styles.css`: identidade visual e responsividade.
 - `tests/automaton.test.js`: testes automatizados do comportamento.
+- `tests/public-contract.test.js`: contrato mínimo da interface pública.
 - `vending-machine.jff`: modelo para abrir no JFLAP.
+- `docs/referencias.md`: roteiro de estudo e referências de Linguagens Formais e Autômatos.
 
-## Validação
+## Status do projeto
 
 `npm test` verifica o contrato do autômato, casos aceitos e rejeitados, laços em `q30+`,
 as 21 combinações estado/moeda e a equivalência entre o arquivo `.jff` e a função de
 transição JavaScript.
 
-Esta versão permanece exclusivamente local enquanto o trabalho é revisado. Antes da
-entrega, será necessário publicar o repositório e a interface em uma URL online, conforme
-o requisito da aula 11. Essa publicação fica deliberadamente para depois da validação.
+O projeto é um protótipo educacional executável, com interface interativa, modelo `.jff`
+compatível com JFLAP e testes automatizados para o comportamento do AFD. A interface
+também apresenta a diferença entre o reconhecedor simplificado deste trabalho e a máquina
+de Mealy completa descrita no artigo de referência.
+
+Para continuar o estudo da disciplina, consulte o [roteiro de referências](docs/referencias.md).
