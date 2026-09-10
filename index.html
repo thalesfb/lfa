@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Simulador visual do autômato finito de uma máquina de vendas para o Trabalho 01 de LFA."
+    />
+    <title>Coin / Product — Vending Machine</title>
+    <link rel="stylesheet" href="src/styles.css" />
+  </head>
+  <body>
+    <div class="ambient-glow ambient-glow-one" aria-hidden="true"></div>
+    <div class="ambient-glow ambient-glow-two" aria-hidden="true"></div>
+
+    <main class="shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-dot"></span> laboratório 01 / linguagens formais</p>
+          <h1>Coin <em>to</em> product</h1>
+          <p class="hero-description">
+            Uma máquina de vendas transformada em autômato: cada moeda move o sistema,
+            até que o valor acumulado alcance o estado final.
+          </p>
+        </div>
+
+        <div class="status-pill" id="machine-status" data-status="waiting" aria-live="polite">
+          <span class="status-light"></span>
+          <span id="status-text">Aguardando moedas</span>
+        </div>
+      </header>
+
+      <section class="workspace" aria-label="Simulador da máquina de vendas">
+        <article class="panel machine-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-kicker">interface da máquina</p>
+              <h2>Insira uma moeda</h2>
+            </div>
+            <span class="panel-index">01</span>
+          </div>
+
+          <div class="machine-screen">
+            <div class="screen-header">
+              <span class="screen-label">estado atual</span>
+              <span class="signal"><span></span> online</span>
+            </div>
+            <div class="state-readout">
+              <strong id="current-state">q0</strong>
+              <span id="state-description">Sem moedas inseridas</span>
+            </div>
+            <div class="credit-row">
+              <div>
+                <span class="screen-label">crédito acumulado</span>
+                <strong id="credit-value">R$ 0,00</strong>
+              </div>
+              <div class="target-value">
+                <span class="screen-label">meta</span>
+                <strong>R$ 0,30</strong>
+              </div>
+            </div>
+            <div class="progress-track" role="progressbar" aria-label="Progresso até o preço do produto" aria-valuemin="0" aria-valuemax="30" aria-valuenow="0">
+              <span id="progress-bar"></span>
+            </div>
+            <p class="screen-note" id="screen-note">O autômato começa no estado inicial q0.</p>
+          </div>
+
+          <div class="coin-controls">
+            <div class="controls-heading">
+              <span class="screen-label">alfabeto de entrada</span>
+              <span class="microcopy">Σ = {5, 10, 25}</span>
+            </div>
+            <div class="coin-grid">
+              <button class="coin-button coin-five" type="button" data-coin="5" aria-label="Inserir moeda de 5 centavos">
+                <span class="coin-symbol">05</span>
+                <span class="coin-caption">centavos</span>
+              </button>
+              <button class="coin-button coin-ten" type="button" data-coin="10" aria-label="Inserir moeda de 10 centavos">
+                <span class="coin-symbol">10</span>
+                <span class="coin-caption">centavos</span>
+              </button>
+              <button class="coin-button coin-twenty-five" type="button" data-coin="25" aria-label="Inserir moeda de 25 centavos">
+                <span class="coin-symbol">25</span>
+                <span class="coin-caption">centavos</span>
+              </button>
+            </div>
+            <div class="action-row">
+              <button class="finish-button" id="finish-button" type="button">
+                <span aria-hidden="true">◎</span> Concluir palavra
+              </button>
+              <button class="reset-button" id="reset-button" type="button">
+                <span aria-hidden="true">↺</span> Reiniciar
+              </button>
+            </div>
+            <p class="formal-note">Depois de q30+, as moedas continuam habilitadas para demonstrar os laços do AFD.</p>
+          </div>
+        </article>
+
+        <article class="panel diagram-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-kicker">mapa de estados</p>
+              <h2>Veja o autômato se mover</h2>
+            </div>
+            <span class="panel-index">02</span>
+          </div>
+
+          <div class="diagram-meta">
+            <span><i class="legend-dot current"></i> estado atual</span>
+            <span><i class="legend-dot final"></i> estado final</span>
+            <span><i class="legend-line"></i> transição</span>
+          </div>
+
+          <div class="diagram-wrap">
+            <svg id="automaton-diagram" viewBox="0 0 780 360" role="img" aria-labelledby="diagram-title diagram-description">
+              <title id="diagram-title">Diagrama de estados da vending machine</title>
+              <desc id="diagram-description">Estados de q0 até q30+, com transições acionadas por moedas de 5, 10 e 25 centavos.</desc>
+            </svg>
+          </div>
+
+          <div class="diagram-callout" id="diagram-callout" aria-live="polite">
+            <span class="callout-arrow">↳</span>
+            <span>Escolha uma moeda para destacar a próxima transição.</span>
+          </div>
+          <p class="visually-hidden" id="transition-announcement" aria-live="polite" aria-atomic="true"></p>
+        </article>
+      </section>
+
+      <section class="trace-grid" aria-label="Rastreamento da execução">
+        <article class="panel trace-panel">
+          <div class="panel-heading compact-heading">
+            <div>
+              <p class="panel-kicker">palavra de entrada</p>
+              <h2>Fita de moedas</h2>
+            </div>
+            <span class="panel-index">03</span>
+          </div>
+          <div class="input-tape" id="input-tape" aria-live="polite"></div>
+          <p class="trace-hint">A palavra é aceita quando o processamento chega a q30+.</p>
+        </article>
+
+        <article class="panel trace-panel history-panel">
+          <div class="panel-heading compact-heading">
+            <div>
+              <p class="panel-kicker">memória de execução</p>
+              <h2>Histórico de transições</h2>
+            </div>
+            <span class="panel-index">04</span>
+          </div>
+          <div class="history-table-wrap">
+            <table class="history-table">
+              <caption class="visually-hidden">Histórico das transições executadas</caption>
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">entrada</th>
+                  <th scope="col">de</th>
+                  <th scope="col">para</th>
+                  <th scope="col">crédito</th>
+                </tr>
+              </thead>
+              <tbody id="history-body"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section class="model-section" aria-label="Especificação formal">
+        <div class="section-intro">
+          <p class="panel-kicker">por trás da interface</p>
+          <h2>O que está sendo modelado?</h2>
+          <p>
+            A interface é uma leitura visual da função de transição. O valor q30+ agrupa
+            qualquer soma maior ou igual a 30, mantendo o autômato finito.
+          </p>
+        </div>
+        <div class="model-cards">
+          <div class="model-card"><span>Σ</span><strong>{5, 10, 25}</strong><small>alfabeto de entrada</small></div>
+          <div class="model-card"><span>q0</span><strong>inicial</strong><small>nenhuma moeda</small></div>
+          <div class="model-card model-card-final"><span>q30+</span><strong>final</strong><small>palavra aceita</small></div>
+          <div class="model-card"><span>δ</span><strong>q + moeda</strong><small>função de transição</small></div>
+        </div>
+      </section>
+
+      <details class="transition-details panel">
+        <summary>Consultar a tabela completa de transições</summary>
+        <div class="transition-table-wrap">
+          <table class="transition-table">
+            <caption class="visually-hidden">Tabela da função de transição do autômato</caption>
+            <thead>
+              <tr><th scope="col">estado</th><th scope="col">5 centavos</th><th scope="col">10 centavos</th><th scope="col">25 centavos</th></tr>
+            </thead>
+            <tbody id="transition-body"></tbody>
+          </table>
+        </div>
+      </details>
+
+      <footer class="footer">
+        <span>LFA / Trabalho 01</span>
+        <span>modelo local · sem publicação</span>
+      </footer>
+    </main>
+
+    <script type="module" src="src/app.js"></script>
+  </body>
+</html>
