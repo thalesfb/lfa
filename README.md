@@ -90,10 +90,12 @@ clique na moeda
 
 - [`src/automaton.js`](src/automaton.js) define `Q`, `Σ`, `δ`, a aceitação e o estado da
   simulação;
-- [`src/app.js`](src/app.js) conecta os botões ao modelo e renderiza visor, fita, histórico
-  e diagrama;
-- [`src/diagram.js`](src/diagram.js) somente agrupa visualmente moedas que têm a mesma
-  origem e destino; ele não altera `δ`;
+- [`src/dom.js`](src/dom.js) concentra a localização dos elementos obrigatórios da página;
+- [`src/ui-render.js`](src/ui-render.js) renderiza visor, fita, histórico, tabela e mensagens,
+  sem controlar eventos;
+- [`src/diagram.js`](src/diagram.js) agrupa transições e desenha o SVG do diagrama; ele não
+  altera `δ`;
+- [`src/app.js`](src/app.js) mantém o estado da interação e conecta os eventos à renderização;
 - [`vending-machine.jff`](vending-machine.jff) contém as mesmas 21 transições para o JFLAP.
 
 “Liberar produto” é uma ação da interface que consulta se o estado alcançado é final; não é
