@@ -1,6 +1,5 @@
 node_modules/
 _pdf_pages/
 
-# Materiais da disciplina: permanecem locais e não devem ser publicados junto do projeto.
-LFA-*.pdf
+# Material complementar da disciplina: permanece local e não deve ser publicado junto do projeto.
 artigo-vending-machine.pdf
