@@ -87,6 +87,7 @@ local é recomendado porque a interface usa módulos JavaScript.
 - `tests/diagram.test.js` e `tests/ui-copy.test.js`: testes das regras de apresentação.
 - `tests/public-contract.test.js`: contrato mínimo da interface pública.
 - `vending-machine.jff`: modelo para abrir no JFLAP.
+- `docs/funcionamento.md`: explicação programática, tabela completa de transições e leitura do `q30+`.
 - `docs/referencias.md`: roteiro de estudo e referências de Linguagens Formais e Autômatos.
 
 ## Status do projeto
@@ -101,3 +102,4 @@ também apresenta a diferença entre o reconhecedor simplificado deste trabalho 
 de Mealy completa descrita no artigo de referência.
 
 Para continuar o estudo da disciplina, consulte o [roteiro de referências](docs/referencias.md).
+Para entender a execução passo a passo e a tabela de transições, consulte a [explicação do funcionamento](docs/funcionamento.md).
