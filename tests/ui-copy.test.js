@@ -25,3 +25,15 @@ test("crédito suficiente comunica que a compra pode ser concluída", () => {
     },
   );
 });
+
+test("saldo insuficiente mantém a máquina disponível para novas moedas", () => {
+  assert.deepEqual(
+    getStatusCopy({ inputLength: 2, accepted: false, wordClosed: false, finishAttempted: true, missingLabel: "R$ 0,15" }),
+    {
+      pillStatus: "rejected",
+      pillLabel: "Saldo insuficiente",
+      screenNote: "Saldo insuficiente. Insira mais moedas para continuar.",
+      deliveryMessage: "Saldo insuficiente — insira mais moedas",
+    },
+  );
+});

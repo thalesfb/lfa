@@ -70,8 +70,10 @@ local é recomendado porque a interface usa módulos JavaScript.
 5. Clique em “Reiniciar”.
 6. Clique em `10`, `10`, `10`. O resultado também deve ser aceito.
 7. Reinicie, clique apenas em `5`, `10` e conclua a palavra. O resultado deve ser rejeitado em `q15`.
-8. Observe o estado destacado, a seta da última transição, a fita e o histórico.
-9. Abra “Consultar a tabela completa de transições” para conferir a função `δ`.
+8. No saldo insuficiente, confirme que a máquina continua aceitando moedas; insira `25` para alcançar `q30+`.
+9. Em uma compra aceita, clique em “Retirar produto” para iniciar uma nova compra sem precisar recarregar a página.
+10. Observe o estado destacado, a seta da última transição, a fita e o histórico.
+11. Abra “Consultar a tabela completa de transições” para conferir a função `δ`.
 
 ## Arquivos
 

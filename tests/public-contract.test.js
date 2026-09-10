@@ -17,6 +17,7 @@ test("a interface pública apresenta os elementos essenciais de uma máquina de 
     'id="coin-slot"',
     'id="purchase-panel"',
     'id="delivery-tray"',
+    'id="collect-button"',
   ]) {
     assert.match(html, new RegExp(marker.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&")), `marcador ausente: ${marker}`);
   }

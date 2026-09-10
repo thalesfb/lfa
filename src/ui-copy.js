@@ -1,4 +1,4 @@
-export const getStatusCopy = ({ inputLength, accepted, wordClosed, missingLabel }) => {
+export const getStatusCopy = ({ inputLength, accepted, wordClosed, finishAttempted = false, missingLabel }) => {
   if (wordClosed) {
     return accepted
       ? {
@@ -21,6 +21,15 @@ export const getStatusCopy = ({ inputLength, accepted, wordClosed, missingLabel 
       pillLabel: "Aguardando moedas",
       screenNote: "Insira uma moeda para iniciar a palavra.",
       deliveryMessage: "Aguardando crédito",
+    };
+  }
+
+  if (finishAttempted && !accepted) {
+    return {
+      pillStatus: "rejected",
+      pillLabel: "Saldo insuficiente",
+      screenNote: "Saldo insuficiente. Insira mais moedas para continuar.",
+      deliveryMessage: "Saldo insuficiente — insira mais moedas",
     };
   }
 

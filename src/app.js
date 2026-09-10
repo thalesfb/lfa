@@ -21,6 +21,7 @@ const progressBar = document.querySelector("#progress-bar");
 const screenNote = document.querySelector("#screen-note");
 const vendingMachine = document.querySelector("#purchase-panel");
 const deliveryMessage = document.querySelector("#delivery-message");
+const collectButton = document.querySelector("#collect-button");
 const inputTape = document.querySelector("#input-tape");
 const historyBody = document.querySelector("#history-body");
 const transitionBody = document.querySelector("#transition-body");
@@ -33,6 +34,7 @@ const finishButton = document.querySelector("#finish-button");
 let machine = createInitialMachine();
 let lastEvent = null;
 let wordClosed = false;
+let finishAttempted = false;
 
 const statePositions = Object.freeze({
   q0: { x: 70, y: 250 },
@@ -153,6 +155,7 @@ const renderStatus = () => {
     inputLength: machine.input.length,
     accepted,
     wordClosed,
+    finishAttempted,
     missingLabel: formatCurrency(Math.max(PRICE_CENTS - machine.credit, 0)),
   });
   machineStatus.dataset.status = copy.pillStatus;
@@ -170,6 +173,7 @@ const renderStatus = () => {
     button.disabled = wordClosed;
   });
   finishButton.disabled = wordClosed;
+  collectButton.hidden = !(wordClosed && accepted);
 };
 
 const renderTape = () => {
@@ -241,6 +245,7 @@ coinButtons.forEach((button) => {
     const coin = Number(button.dataset.coin);
     machine = applyCoin(machine, coin);
     lastEvent = machine.history.at(-1);
+    finishAttempted = false;
     button.classList.remove("is-pressed");
     void button.offsetWidth;
     button.classList.add("is-pressed");
@@ -249,15 +254,20 @@ coinButtons.forEach((button) => {
 });
 
 finishButton.addEventListener("click", () => {
-  wordClosed = true;
+  finishAttempted = true;
+  wordClosed = machine.accepted;
   render();
 });
 
-document.querySelector("#reset-button").addEventListener("click", () => {
+const resetMachine = () => {
   machine = createInitialMachine();
   lastEvent = null;
   wordClosed = false;
+  finishAttempted = false;
   render();
-});
+};
+
+document.querySelector("#reset-button").addEventListener("click", resetMachine);
+collectButton.addEventListener("click", resetMachine);
 
 render();
