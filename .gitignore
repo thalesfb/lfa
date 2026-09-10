@@ -1,0 +1,6 @@
+node_modules/
+_pdf_pages/
+
+# Materiais da disciplina: permanecem locais e não devem ser publicados junto do projeto.
+LFA-*.pdf
+artigo-vending-machine.pdf
