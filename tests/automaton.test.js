@@ -158,6 +158,8 @@ test("keeps the JFLAP artifact equivalent to the JavaScript transition function"
 
   assert.equal(statesById.size, STATES.length);
   assert.deepEqual([...statesById.values()].sort(), [...STATES].sort());
+  assert.match(jff, /<type>fa<\/type>/);
+  assert.doesNotMatch(jff, /<write>/);
   assert.equal(transitionNodes.length, STATES.length * COINS.length);
   assert.equal(transitions.length, STATES.length * COINS.length);
   const stateBlocks = [...jff.matchAll(/<state id="(\d+)" name="([^"]+)">([\s\S]*?)<\/state>/g)];
