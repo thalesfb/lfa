@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Simulador visual do autômato finito de uma máquina de vendas para o Trabalho 01 de LFA."
+    />
+    <title>VEND-30 — Máquina de vendas</title>
+    <link rel="stylesheet" href="src/styles.css" />
+  </head>
+  <body>
+    <div class="ambient-glow ambient-glow-one" aria-hidden="true"></div>
+    <div class="ambient-glow ambient-glow-two" aria-hidden="true"></div>
+
+    <main class="shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-dot"></span> vend-30 / linguagens formais</p>
+          <h1>Máquina <em>de</em> vendas</h1>
+          <p class="hero-description">
+            Insira moedas, acompanhe o crédito e veja o autômato decidir quando o produto
+            pode ser liberado.
+          </p>
+        </div>
+
+        <div class="status-pill" id="machine-status" data-status="waiting" aria-live="polite">
+          <span class="status-light"></span>
+          <span id="status-text">Aguardando moedas</span>
+        </div>
+      </header>
+
+      <section class="workspace" aria-label="Simulador da máquina de vendas">
+        <article class="panel machine-panel vending-machine" id="purchase-panel" aria-label="Máquina de vendas VEND-30">
+          <div class="machine-brand">
+            <div>
+              <span class="machine-brand-mark">VEND-30</span>
+              <span class="machine-brand-subtitle">automatic dispenser</span>
+            </div>
+            <span class="machine-led"><span></span> ready</span>
+          </div>
+
+          <div class="product-window" id="product-window" aria-label="Produtos disponíveis">
+            <div class="window-header">
+              <span>Selecione um produto</span>
+              <span>preço único · 30¢</span>
+            </div>
+            <div class="product-shelf">
+              <div class="product-slot" aria-label="Produto A, preço 30 centavos">
+                <div class="product-shape product-can product-can-orange" aria-hidden="true"><span>A</span></div>
+                <span>Produto A</span>
+                <strong>30¢</strong>
+              </div>
+              <div class="product-slot" aria-label="Produto B, preço 30 centavos">
+                <div class="product-shape product-box product-box-teal" aria-hidden="true"><span>B</span></div>
+                <span>Produto B</span>
+                <strong>30¢</strong>
+              </div>
+              <div class="product-slot" aria-label="Produto C, preço 30 centavos">
+                <div class="product-shape product-can product-can-yellow" aria-hidden="true"><span>C</span></div>
+                <span>Produto C</span>
+                <strong>30¢</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="machine-display" id="machine-display">
+            <div class="screen-header">
+              <span class="screen-label">painel de operação</span>
+              <span class="signal"><span></span> online</span>
+            </div>
+            <div class="state-readout">
+              <strong id="current-state">q0</strong>
+              <span id="state-description">Sem moedas inseridas</span>
+            </div>
+            <div class="credit-row">
+              <div>
+                <span class="screen-label">crédito acumulado</span>
+                <strong id="credit-value">R$ 0,00</strong>
+              </div>
+              <div class="target-value">
+                <span class="screen-label">preço</span>
+                <strong>R$ 0,30</strong>
+              </div>
+            </div>
+            <div class="progress-track" role="progressbar" aria-label="Progresso até o preço do produto" aria-valuemin="0" aria-valuemax="30" aria-valuenow="0">
+              <span id="progress-bar"></span>
+            </div>
+            <p class="screen-note" id="screen-note">O autômato começa no estado inicial q0.</p>
+          </div>
+
+          <div class="machine-controls">
+            <div class="coin-slot" id="coin-slot" aria-hidden="true"><span></span></div>
+            <div class="slot-caption"><span>Entrada de moedas</span><small>5¢ · 10¢ · 25¢</small></div>
+            <div class="coin-controls">
+              <div class="controls-heading">
+                <span class="screen-label">escolha uma moeda</span>
+                <span class="microcopy">Σ = {5, 10, 25}</span>
+              </div>
+              <div class="coin-grid">
+                <button class="coin-button coin-five" type="button" data-coin="5" aria-label="Inserir moeda de 5 centavos">
+                  <span class="coin-symbol">05</span>
+                  <span class="coin-caption">centavos</span>
+                </button>
+                <button class="coin-button coin-ten" type="button" data-coin="10" aria-label="Inserir moeda de 10 centavos">
+                  <span class="coin-symbol">10</span>
+                  <span class="coin-caption">centavos</span>
+                </button>
+                <button class="coin-button coin-twenty-five" type="button" data-coin="25" aria-label="Inserir moeda de 25 centavos">
+                  <span class="coin-symbol">25</span>
+                  <span class="coin-caption">centavos</span>
+                </button>
+              </div>
+              <div class="action-row">
+                <button class="finish-button" id="finish-button" type="button">
+                  <span aria-hidden="true">◎</span> Liberar produto
+                </button>
+                <button class="reset-button" id="reset-button" type="button">
+                  <span aria-hidden="true">↺</span> Reiniciar
+                </button>
+              </div>
+              <p class="formal-note">A entrada permanece habilitada em q30+ para demonstrar os laços do AFD.</p>
+            </div>
+          </div>
+
+          <div class="delivery-tray" id="delivery-tray" aria-live="polite">
+            <div class="tray-opening" aria-hidden="true"><span></span></div>
+            <div class="tray-message">
+              <span class="tray-label">Compartimento de entrega</span>
+              <strong id="delivery-message">Aguardando crédito</strong>
+            </div>
+            <button class="collect-button" id="collect-button" type="button" hidden>Retirar produto</button>
+          </div>
+        </article>
+
+        <article class="panel diagram-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-kicker">por trás da máquina</p>
+              <h2>Como a máquina decide</h2>
+            </div>
+            <span class="panel-index">02</span>
+          </div>
+
+          <div class="diagram-meta">
+            <span><i class="legend-dot current"></i> estado atual</span>
+            <span><i class="legend-dot final"></i> estado final</span>
+            <span><i class="legend-line"></i> transição</span>
+            <span><i class="legend-line visited"></i> caminho percorrido</span>
+          </div>
+
+          <div class="diagram-wrap">
+            <svg id="automaton-diagram" viewBox="0 0 1080 430" role="img" aria-labelledby="diagram-title diagram-description">
+              <title id="diagram-title">Diagrama de estados da vending machine</title>
+              <desc id="diagram-description">Estados de q0 até q30+, com transições acionadas por moedas de 5, 10 e 25 centavos.</desc>
+            </svg>
+          </div>
+
+          <div class="diagram-mobile-fallback" id="diagram-mobile-fallback">
+            <div class="mobile-fallback-heading">
+              <p class="panel-kicker">visualização para telas estreitas</p>
+              <h3>As mesmas transições, sem cruzamento de setas</h3>
+            </div>
+            <div class="mobile-transition-table-wrap">
+              <table class="mobile-transition-table">
+                <caption class="visually-hidden">Tabela de transições para telas estreitas</caption>
+                <thead>
+                  <tr><th scope="col">estado</th><th scope="col">5¢</th><th scope="col">10¢</th><th scope="col">25¢</th></tr>
+                </thead>
+                <tbody id="mobile-transition-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="diagram-callout" id="diagram-callout" aria-live="polite">
+            <span class="callout-arrow">↳</span>
+            <span>Escolha uma moeda para destacar a próxima transição.</span>
+          </div>
+          <div class="diagram-reading-guide" id="diagram-reading-guide" aria-label="Exemplos de leitura das transições">
+            <div class="guide-heading">
+              <div>
+                <p class="panel-kicker">leitura rápida</p>
+                <h3>Como ler as setas</h3>
+              </div>
+              <span>δ(estado, moeda) → próximo estado</span>
+            </div>
+            <div class="transition-examples">
+              <div class="transition-example" id="transition-example-q0-5">
+                <code>q0 + 5¢</code><span aria-hidden="true">→</span><strong>q5</strong>
+                <small>crédito acumulado: 5¢</small>
+              </div>
+              <div class="transition-example" id="transition-example-q0-10">
+                <code>q0 + 10¢</code><span aria-hidden="true">→</span><strong>q10</strong>
+                <small>crédito acumulado: 10¢</small>
+              </div>
+              <div class="transition-example" id="transition-example-q0-25">
+                <code>q0 + 25¢</code><span aria-hidden="true">→</span><strong>q25</strong>
+                <small>crédito acumulado: 25¢</small>
+              </div>
+            </div>
+            <p class="guide-note">
+              Cada estado tem uma saída para cada moeda de Σ = {5, 10, 25}. Quando moedas diferentes
+              chegam ao mesmo destino, seus rótulos são agrupados na mesma seta. Em <strong>q30+</strong>,
+              qualquer nova moeda mantém o autômato no estado final.
+            </p>
+            <p class="guide-path-example">
+              <span>Exemplo intermediário:</span>
+              <code id="transition-example-q15-10">q15 + 10¢ → q25</code>
+              <code>q15 + 25¢ → q30+</code>
+            </p>
+          </div>
+          <p class="visually-hidden" id="transition-announcement" aria-live="polite" aria-atomic="true"></p>
+        </article>
+      </section>
+
+      <section class="trace-grid" aria-label="Rastreamento da execução">
+        <article class="panel trace-panel">
+          <div class="panel-heading compact-heading">
+            <div>
+              <p class="panel-kicker">palavra de entrada</p>
+              <h2>Fita de moedas</h2>
+            </div>
+            <span class="panel-index">03</span>
+          </div>
+          <div class="input-tape" id="input-tape" aria-live="polite"></div>
+          <p class="trace-hint">A palavra é aceita quando o processamento chega a q30+.</p>
+        </article>
+
+        <article class="panel trace-panel history-panel">
+          <div class="panel-heading compact-heading">
+            <div>
+              <p class="panel-kicker">memória de execução</p>
+              <h2>Histórico de transições</h2>
+            </div>
+            <span class="panel-index">04</span>
+          </div>
+          <div class="history-table-wrap">
+            <table class="history-table">
+              <caption class="visually-hidden">Histórico das transições executadas</caption>
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">entrada</th>
+                  <th scope="col">de</th>
+                  <th scope="col">para</th>
+                  <th scope="col">crédito</th>
+                </tr>
+              </thead>
+              <tbody id="history-body"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section class="model-section" aria-label="Especificação formal">
+        <div class="section-intro">
+          <p class="panel-kicker">por trás da interface</p>
+          <h2>O que está sendo modelado?</h2>
+          <p>
+            A interface é uma leitura visual da função de transição. O valor q30+ agrupa
+            qualquer soma maior ou igual a 30, mantendo o autômato finito.
+          </p>
+        </div>
+        <div class="model-cards">
+          <div class="model-card"><span>Σ</span><strong>{5, 10, 25}</strong><small>alfabeto de entrada</small></div>
+          <div class="model-card"><span>q0</span><strong>inicial</strong><small>nenhuma moeda</small></div>
+          <div class="model-card model-card-final"><span>q30+</span><strong>final</strong><small>palavra aceita</small></div>
+          <div class="model-card"><span>δ</span><strong>q + moeda</strong><small>função de transição</small></div>
+        </div>
+      </section>
+
+      <details class="transition-details panel">
+        <summary>Consultar a tabela completa de transições</summary>
+        <div class="transition-table-wrap">
+          <table class="transition-table">
+            <caption class="visually-hidden">Tabela da função de transição do autômato</caption>
+            <thead>
+              <tr><th scope="col">estado</th><th scope="col">5 centavos</th><th scope="col">10 centavos</th><th scope="col">25 centavos</th></tr>
+            </thead>
+            <tbody id="transition-body"></tbody>
+          </table>
+        </div>
+      </details>
+
+      <footer class="footer">
+        <span>LFA / Trabalho 01</span>
+        <span>AFD interativo · modelo educacional</span>
+      </footer>
+    </main>
+
+    <script type="module" src="src/app.js"></script>
+  </body>
+</html>

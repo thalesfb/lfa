@@ -1,0 +1,5 @@
+node_modules/
+_pdf_pages/
+
+# Material complementar da disciplina: permanece local e não deve ser publicado junto do projeto.
+artigo-vending-machine.pdf
