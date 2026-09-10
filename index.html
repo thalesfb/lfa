@@ -151,7 +151,7 @@
           </div>
 
           <div class="diagram-wrap">
-            <svg id="automaton-diagram" viewBox="0 0 980 430" role="img" aria-labelledby="diagram-title diagram-description">
+            <svg id="automaton-diagram" viewBox="0 0 1080 430" role="img" aria-labelledby="diagram-title diagram-description">
               <title id="diagram-title">Diagrama de estados da vending machine</title>
               <desc id="diagram-description">Estados de q0 até q30+, com transições acionadas por moedas de 5, 10 e 25 centavos.</desc>
             </svg>
@@ -203,6 +203,11 @@
               Cada estado tem uma saída para cada moeda de Σ = {5, 10, 25}. Quando moedas diferentes
               chegam ao mesmo destino, seus rótulos são agrupados na mesma seta. Em <strong>q30+</strong>,
               qualquer nova moeda mantém o autômato no estado final.
+            </p>
+            <p class="guide-path-example">
+              <span>Exemplo intermediário:</span>
+              <code id="transition-example-q15-10">q15 + 10¢ → q25</code>
+              <code>q15 + 25¢ → q30+</code>
             </p>
           </div>
           <p class="visually-hidden" id="transition-announcement" aria-live="polite" aria-atomic="true"></p>

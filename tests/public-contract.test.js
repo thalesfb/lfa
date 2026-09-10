@@ -28,10 +28,12 @@ test("a interface pública apresenta os elementos essenciais de uma máquina de 
   assert.match(html, /id="diagram-reading-guide"/);
   assert.match(html, /id="diagram-mobile-fallback"/);
   assert.match(html, /id="mobile-transition-body"/);
+  assert.match(html, /viewBox="0 0 1080 430"/);
   for (const marker of [
     'id="transition-example-q0-5"',
     'id="transition-example-q0-10"',
     'id="transition-example-q0-25"',
+    'id="transition-example-q15-10"',
   ]) {
     assert.match(html, new RegExp(marker.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&")), `exemplo ausente: ${marker}`);
   }

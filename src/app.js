@@ -38,13 +38,13 @@ let wordClosed = false;
 let finishAttempted = false;
 
 const statePositions = Object.freeze({
-  q0: { x: 70, y: 320 },
-  q5: { x: 220, y: 320 },
-  q10: { x: 370, y: 320 },
-  q15: { x: 520, y: 320 },
-  q20: { x: 670, y: 320 },
-  q25: { x: 370, y: 100 },
-  [FINAL_STATE]: { x: 820, y: 100 },
+  q0: { x: 70, y: 300 },
+  q5: { x: 220, y: 180 },
+  q10: { x: 370, y: 300 },
+  q15: { x: 520, y: 180 },
+  q20: { x: 670, y: 300 },
+  q25: { x: 820, y: 180 },
+  [FINAL_STATE]: { x: 970, y: 80 },
 });
 
 const formatCurrency = (cents) => {
@@ -64,7 +64,7 @@ const edgeGeometry = (from, to, coin) => {
   }
 
   if (to === FINAL_STATE) {
-    const finalLane = { q5: 410, q10: 380, q15: 350, q20: 320, q25: 168 }[from] ?? 360;
+    const finalLane = { q5: 410, q10: 385, q15: 360, q20: 335, q25: 135 }[from] ?? 360;
     const dx = target.x - source.x;
     const dy = target.y - source.y;
     const distance = Math.hypot(dx, dy);
@@ -121,12 +121,14 @@ const renderDiagram = () => {
     const geometry = edgeGeometry(from, to, coins[0]);
     const active = transitionIsActive(from, to, coins);
     const visits = transitionVisitCount(from, to, coins);
-    const label = coins.join(" · ");
+    const label = coins.map((coin) => `${coin}¢`).join(" · ");
+    const labelWidth = label.length * 8 + 14;
     const accessibleLabel = `${from} + ${coins.join(", ")} centavos para ${to}`;
     return `
       <g class="diagram-edge ${visits ? "is-visited" : ""} ${active ? "is-active" : ""}" data-from="${from}" data-to="${to}" data-coins="${coins.join(",")}" data-visits="${visits}" role="group" aria-label="${accessibleLabel}">
         <title>${accessibleLabel}</title>
         <path d="${geometry.path}" marker-end="url(#arrow)" />
+        <rect class="edge-label-backdrop" x="${geometry.label.x - labelWidth / 2}" y="${geometry.label.y - 16}" width="${labelWidth}" height="22" rx="3" aria-hidden="true" />
         <text x="${geometry.label.x}" y="${geometry.label.y}" text-anchor="middle">${label}</text>
       </g>
     `;

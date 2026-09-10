@@ -648,6 +648,8 @@ body {
 .transition-example small { grid-column: 1 / -1; color: var(--ink-soft); font: 9px/1.35 "Courier New", monospace; }
 .guide-note { margin: 12px 0 0; color: var(--ink-soft); font-size: 12px; line-height: 1.45; }
 .guide-note strong { color: var(--orange-dark); font-family: "Courier New", monospace; }
+.guide-path-example { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 12px 0 0; padding-top: 11px; border-top: 1px solid rgba(40,99,107,.16); color: var(--ink-soft); font: 700 9px "Courier New", monospace; }
+.guide-path-example code { padding: 5px 7px; color: var(--teal-dark); background: rgba(184,216,111,.32); }
 
 @media (max-width: 620px) {
   .guide-heading { display: block; }
@@ -671,6 +673,9 @@ body {
 .diagram-edge path { stroke: #6b7970; opacity: .86; }
 #automaton-diagram marker path { fill: #6b7970; }
 .diagram-edge text { fill: #405047; }
+.edge-label-backdrop { fill: var(--paper); opacity: .92; }
+.diagram-edge text { font-size: 13px; }
+.diagram-node .node-label { font-size: 12px; }
 .diagram-node.is-final.is-current .node-circle { fill: var(--lime); stroke: var(--orange-dark); stroke-width: 4; }
 .diagram-node.is-final.is-current .node-label { fill: var(--teal-dark); }
 .diagram-edge.is-visited path { stroke: var(--teal); stroke-width: 2.6; opacity: .95; }
