@@ -78,8 +78,11 @@ local é recomendado porque a interface usa módulos JavaScript.
 - `index.html`: interface do simulador.
 - `src/automaton.js`: contrato e regras do autômato.
 - `src/app.js`: integração entre o autômato e a interface.
+- `src/ui-copy.js`: mensagens derivadas do estado operacional da máquina.
+- `src/diagram.js`: agrupamento visual de transições com o mesmo destino.
 - `src/styles.css`: identidade visual e responsividade.
 - `tests/automaton.test.js`: testes automatizados do comportamento.
+- `tests/diagram.test.js` e `tests/ui-copy.test.js`: testes das regras de apresentação.
 - `tests/public-contract.test.js`: contrato mínimo da interface pública.
 - `vending-machine.jff`: modelo para abrir no JFLAP.
 - `docs/referencias.md`: roteiro de estudo e referências de Linguagens Formais e Autômatos.

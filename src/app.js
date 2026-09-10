@@ -9,6 +9,8 @@ import {
   isFinalState,
   transition,
 } from "./automaton.js";
+import { groupTransitions } from "./diagram.js";
+import { getStatusCopy } from "./ui-copy.js";
 
 const machineStatus = document.querySelector("#machine-status");
 const statusText = document.querySelector("#status-text");
@@ -58,6 +60,27 @@ const edgeGeometry = (from, to, coin) => {
     };
   }
 
+  if (to === FINAL_STATE) {
+    const finalLane = { q5: 48, q10: 76, q15: 104, q20: 132, q25: 164 }[from] ?? 96;
+    const dx = target.x - source.x;
+    const dy = target.y - source.y;
+    const distance = Math.hypot(dx, dy);
+    const start = {
+      x: source.x + (dx / distance) * 29,
+      y: source.y + (dy / distance) * 29,
+    };
+    const end = {
+      x: target.x - (dx / distance) * 29,
+      y: target.y - (dy / distance) * 29,
+    };
+    const control = { x: (start.x + end.x) / 2, y: finalLane };
+
+    return {
+      path: `M ${start.x.toFixed(1)} ${start.y.toFixed(1)} Q ${control.x.toFixed(1)} ${control.y.toFixed(1)} ${end.x.toFixed(1)} ${end.y.toFixed(1)}`,
+      label: { x: control.x, y: control.y - 7 },
+    };
+  }
+
   const dx = target.x - source.x;
   const dy = target.y - source.y;
   const distance = Math.hypot(dx, dy);
@@ -80,26 +103,22 @@ const edgeGeometry = (from, to, coin) => {
   };
 };
 
-const transitionIsActive = (from, to, coin) => {
-  return lastEvent?.from === from && lastEvent?.to === to && lastEvent?.coin === coin;
+const transitionIsActive = (from, to, coins) => {
+  return lastEvent?.from === from && lastEvent?.to === to && coins.includes(lastEvent.coin);
 };
 
 const renderDiagram = () => {
-  const edges = [];
-
-  for (const from of STATES) {
-    for (const coin of COINS) {
-      const to = transition(from, coin);
-      const geometry = edgeGeometry(from, to, coin);
-      const active = transitionIsActive(from, to, coin);
-      edges.push(`
-        <g class="diagram-edge ${active ? "is-active" : ""}" data-from="${from}" data-to="${to}" data-coin="${coin}">
-          <path d="${geometry.path}" marker-end="url(#arrow)" />
-          <text x="${geometry.label.x}" y="${geometry.label.y}" text-anchor="middle">${coin}</text>
-        </g>
-      `);
-    }
-  }
+  const edges = groupTransitions(STATES, COINS, transition).map(({ from, to, coins }) => {
+    const geometry = edgeGeometry(from, to, coins[0]);
+    const active = transitionIsActive(from, to, coins);
+    const label = coins.join(" · ");
+    return `
+      <g class="diagram-edge ${active ? "is-active" : ""}" data-from="${from}" data-to="${to}" data-coins="${coins.join(",")}">
+        <path d="${geometry.path}" marker-end="url(#arrow)" />
+        <text x="${geometry.label.x}" y="${geometry.label.y}" text-anchor="middle">${label}</text>
+      </g>
+    `;
+  });
 
   const nodes = STATES.map((state) => {
     const position = statePositions[state];
@@ -130,27 +149,22 @@ const renderDiagram = () => {
 
 const renderStatus = () => {
   const accepted = machine.accepted;
-  const status = wordClosed ? (accepted ? "accepted" : "rejected") : accepted ? "accepted" : "waiting";
-  machineStatus.dataset.status = status;
-  vendingMachine.dataset.status = status;
-  statusText.textContent = wordClosed
-    ? accepted ? "Palavra aceita" : "Palavra rejeitada"
-    : accepted ? "Estado final alcançado" : "Processando palavra";
+  const copy = getStatusCopy({
+    inputLength: machine.input.length,
+    accepted,
+    wordClosed,
+    missingLabel: formatCurrency(Math.max(PRICE_CENTS - machine.credit, 0)),
+  });
+  machineStatus.dataset.status = copy.pillStatus;
+  vendingMachine.dataset.status = copy.pillStatus;
+  statusText.textContent = copy.pillLabel;
   currentState.textContent = machine.state;
   stateDescription.textContent = describeState(machine.state);
   creditValue.textContent = formatCurrency(machine.credit);
   progressBar.style.width = `${Math.min((machine.credit / PRICE_CENTS) * 100, 100)}%`;
   progressBar.parentElement.setAttribute("aria-valuenow", String(Math.min(machine.credit, PRICE_CENTS)));
-  screenNote.textContent = wordClosed
-    ? accepted
-      ? "Palavra encerrada em estado final: condição de aceitação satisfeita."
-      : "Palavra encerrada sem alcançar um estado final."
-    : accepted
-      ? "Estado final alcançado. Você pode observar os laços absorventes antes de concluir."
-      : `Prefixo em processamento. Faltam ${formatCurrency(Math.max(PRICE_CENTS - machine.credit, 0))} para alcançar q30+.`;
-  deliveryMessage.textContent = wordClosed
-    ? accepted ? "Produto liberado — retire aqui" : "Crédito insuficiente"
-    : accepted ? "Crédito suficiente — conclua a compra" : "Aguardando crédito";
+  screenNote.textContent = copy.screenNote;
+  deliveryMessage.textContent = copy.deliveryMessage;
 
   coinButtons.forEach((button) => {
     button.disabled = wordClosed;
