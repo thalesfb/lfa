@@ -24,6 +24,7 @@ test("a interface pública apresenta os elementos essenciais de uma máquina de 
 
   assert.match(html, /Máquina de vendas/i);
   assert.match(html, /Como a máquina decide/i);
+  assert.match(html, /caminho percorrido/i);
   assert.match(html, /id="diagram-reading-guide"/);
   assert.match(html, /id="diagram-mobile-fallback"/);
   assert.match(html, /id="mobile-transition-body"/);

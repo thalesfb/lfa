@@ -38,13 +38,13 @@ let wordClosed = false;
 let finishAttempted = false;
 
 const statePositions = Object.freeze({
-  q0: { x: 70, y: 250 },
-  q5: { x: 190, y: 250 },
-  q10: { x: 310, y: 250 },
-  q15: { x: 430, y: 250 },
-  q20: { x: 550, y: 250 },
-  q25: { x: 230, y: 100 },
-  [FINAL_STATE]: { x: 650, y: 100 },
+  q0: { x: 70, y: 320 },
+  q5: { x: 220, y: 320 },
+  q10: { x: 370, y: 320 },
+  q15: { x: 520, y: 320 },
+  q20: { x: 670, y: 320 },
+  q25: { x: 370, y: 100 },
+  [FINAL_STATE]: { x: 820, y: 100 },
 });
 
 const formatCurrency = (cents) => {
@@ -64,7 +64,7 @@ const edgeGeometry = (from, to, coin) => {
   }
 
   if (to === FINAL_STATE) {
-    const finalLane = { q5: 48, q10: 76, q15: 104, q20: 132, q25: 164 }[from] ?? 96;
+    const finalLane = { q5: 410, q10: 380, q15: 350, q20: 320, q25: 168 }[from] ?? 360;
     const dx = target.x - source.x;
     const dy = target.y - source.y;
     const distance = Math.hypot(dx, dy);
@@ -96,7 +96,7 @@ const edgeGeometry = (from, to, coin) => {
     y: target.y - (dy / distance) * 29,
   };
   const midpoint = { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 };
-  const lane = { 5: 22, 10: 42, 25: 64 }[coin];
+  const lane = { 5: 24, 10: 52, 25: 82 }[coin];
   const curveDirection = dy < -1 ? -1 : 1;
   const control = { x: midpoint.x, y: midpoint.y + curveDirection * lane };
 
@@ -110,14 +110,21 @@ const transitionIsActive = (from, to, coins) => {
   return lastEvent?.from === from && lastEvent?.to === to && coins.includes(lastEvent.coin);
 };
 
+const transitionVisitCount = (from, to, coins) => {
+  return machine.history.filter(
+    (event) => event.from === from && event.to === to && coins.includes(event.coin),
+  ).length;
+};
+
 const renderDiagram = () => {
   const edges = groupTransitions(STATES, COINS, transition).map(({ from, to, coins }) => {
     const geometry = edgeGeometry(from, to, coins[0]);
     const active = transitionIsActive(from, to, coins);
+    const visits = transitionVisitCount(from, to, coins);
     const label = coins.join(" · ");
     const accessibleLabel = `${from} + ${coins.join(", ")} centavos para ${to}`;
     return `
-      <g class="diagram-edge ${active ? "is-active" : ""}" data-from="${from}" data-to="${to}" data-coins="${coins.join(",")}" role="group" aria-label="${accessibleLabel}">
+      <g class="diagram-edge ${visits ? "is-visited" : ""} ${active ? "is-active" : ""}" data-from="${from}" data-to="${to}" data-coins="${coins.join(",")}" data-visits="${visits}" role="group" aria-label="${accessibleLabel}">
         <title>${accessibleLabel}</title>
         <path d="${geometry.path}" marker-end="url(#arrow)" />
         <text x="${geometry.label.x}" y="${geometry.label.y}" text-anchor="middle">${label}</text>
@@ -150,7 +157,7 @@ const renderDiagram = () => {
         <path d="M 0 0 L 10 5 L 0 10 z" />
       </marker>
     </defs>
-    <text class="diagram-axis-label" x="12" y="330">q0 → q30+ · quantidade acumulada de centavos</text>
+    <text class="diagram-axis-label" x="12" y="405">q0 → q30+ · quantidade acumulada de centavos</text>
     ${edges.join("")}
     ${nodes}
   `;

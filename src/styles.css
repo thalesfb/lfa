@@ -241,6 +241,7 @@ h2 { margin-bottom: 0; font-size: clamp(1.55rem, 2.4vw, 2.2rem); font-weight: 40
 .legend-dot.current { background: var(--orange); box-shadow: 0 0 0 3px rgba(225,95,53,.14); }
 .legend-dot.final { background: var(--lime); }
 .legend-line { width: 16px; height: 1px; background: var(--teal); }
+.legend-line.visited { height: 3px; background: var(--teal); }
 .diagram-wrap { overflow: visible; margin: 0 -4px; padding: 4px 0 0; }
 #automaton-diagram { display: block; width: 100%; min-width: 0; height: auto; overflow: visible; }
 .diagram-axis-label { fill: var(--ink-soft); font: 700 9px "Courier New", monospace; letter-spacing: .05em; text-transform: uppercase; }
@@ -672,6 +673,11 @@ body {
 .diagram-edge text { fill: #405047; }
 .diagram-node.is-final.is-current .node-circle { fill: var(--lime); stroke: var(--orange-dark); stroke-width: 4; }
 .diagram-node.is-final.is-current .node-label { fill: var(--teal-dark); }
+.diagram-edge.is-visited path { stroke: var(--teal); stroke-width: 2.6; opacity: .95; }
+.diagram-edge.is-visited text { fill: var(--teal-dark); }
+.diagram-edge.is-visited marker path { fill: var(--teal); }
+.diagram-edge.is-active path { stroke: var(--orange); stroke-width: 3; opacity: 1; filter: drop-shadow(0 0 3px rgba(225,95,53,.4)); }
+.diagram-edge.is-active text { fill: var(--orange-dark); font-weight: 700; }
 
 @media (max-width: 620px) {
   .diagram-wrap { display: none; }
