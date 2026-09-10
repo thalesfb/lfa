@@ -7,7 +7,7 @@
       name="description"
       content="Simulador visual do autômato finito de uma máquina de vendas para o Trabalho 01 de LFA."
     />
-    <title>Coin / Product — Vending Machine</title>
+    <title>VEND-30 — Máquina de vendas</title>
     <link rel="stylesheet" href="src/styles.css" />
   </head>
   <body>
@@ -17,11 +17,11 @@
     <main class="shell">
       <header class="hero">
         <div class="hero-copy">
-          <p class="eyebrow"><span class="eyebrow-dot"></span> laboratório 01 / linguagens formais</p>
-          <h1>Coin <em>to</em> product</h1>
+          <p class="eyebrow"><span class="eyebrow-dot"></span> vend-30 / linguagens formais</p>
+          <h1>Máquina <em>de</em> vendas</h1>
           <p class="hero-description">
-            Uma máquina de vendas transformada em autômato: cada moeda move o sistema,
-            até que o valor acumulado alcance o estado final.
+            Insira moedas, acompanhe o crédito e veja o autômato decidir quando o produto
+            pode ser liberado.
           </p>
         </div>
 
@@ -32,18 +32,42 @@
       </header>
 
       <section class="workspace" aria-label="Simulador da máquina de vendas">
-        <article class="panel machine-panel">
-          <div class="panel-heading">
+        <article class="panel machine-panel vending-machine" id="purchase-panel" aria-label="Máquina de vendas VEND-30">
+          <div class="machine-brand">
             <div>
-              <p class="panel-kicker">interface da máquina</p>
-              <h2>Insira uma moeda</h2>
+              <span class="machine-brand-mark">VEND-30</span>
+              <span class="machine-brand-subtitle">automatic dispenser</span>
             </div>
-            <span class="panel-index">01</span>
+            <span class="machine-led"><span></span> ready</span>
           </div>
 
-          <div class="machine-screen">
+          <div class="product-window" id="product-window" aria-label="Produtos disponíveis">
+            <div class="window-header">
+              <span>Selecione um produto</span>
+              <span>preço único · 30¢</span>
+            </div>
+            <div class="product-shelf">
+              <div class="product-slot" aria-label="Produto A, preço 30 centavos">
+                <div class="product-shape product-can product-can-orange" aria-hidden="true"><span>A</span></div>
+                <span>Produto A</span>
+                <strong>30¢</strong>
+              </div>
+              <div class="product-slot" aria-label="Produto B, preço 30 centavos">
+                <div class="product-shape product-box product-box-teal" aria-hidden="true"><span>B</span></div>
+                <span>Produto B</span>
+                <strong>30¢</strong>
+              </div>
+              <div class="product-slot" aria-label="Produto C, preço 30 centavos">
+                <div class="product-shape product-can product-can-yellow" aria-hidden="true"><span>C</span></div>
+                <span>Produto C</span>
+                <strong>30¢</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="machine-display" id="machine-display">
             <div class="screen-header">
-              <span class="screen-label">estado atual</span>
+              <span class="screen-label">painel de operação</span>
               <span class="signal"><span></span> online</span>
             </div>
             <div class="state-readout">
@@ -56,7 +80,7 @@
                 <strong id="credit-value">R$ 0,00</strong>
               </div>
               <div class="target-value">
-                <span class="screen-label">meta</span>
+                <span class="screen-label">preço</span>
                 <strong>R$ 0,30</strong>
               </div>
             </div>
@@ -66,42 +90,54 @@
             <p class="screen-note" id="screen-note">O autômato começa no estado inicial q0.</p>
           </div>
 
-          <div class="coin-controls">
-            <div class="controls-heading">
-              <span class="screen-label">alfabeto de entrada</span>
-              <span class="microcopy">Σ = {5, 10, 25}</span>
+          <div class="machine-controls">
+            <div class="coin-slot" id="coin-slot" aria-hidden="true"><span></span></div>
+            <div class="slot-caption"><span>Entrada de moedas</span><small>5¢ · 10¢ · 25¢</small></div>
+            <div class="coin-controls">
+              <div class="controls-heading">
+                <span class="screen-label">escolha uma moeda</span>
+                <span class="microcopy">Σ = {5, 10, 25}</span>
+              </div>
+              <div class="coin-grid">
+                <button class="coin-button coin-five" type="button" data-coin="5" aria-label="Inserir moeda de 5 centavos">
+                  <span class="coin-symbol">05</span>
+                  <span class="coin-caption">centavos</span>
+                </button>
+                <button class="coin-button coin-ten" type="button" data-coin="10" aria-label="Inserir moeda de 10 centavos">
+                  <span class="coin-symbol">10</span>
+                  <span class="coin-caption">centavos</span>
+                </button>
+                <button class="coin-button coin-twenty-five" type="button" data-coin="25" aria-label="Inserir moeda de 25 centavos">
+                  <span class="coin-symbol">25</span>
+                  <span class="coin-caption">centavos</span>
+                </button>
+              </div>
+              <div class="action-row">
+                <button class="finish-button" id="finish-button" type="button">
+                  <span aria-hidden="true">◎</span> Liberar produto
+                </button>
+                <button class="reset-button" id="reset-button" type="button">
+                  <span aria-hidden="true">↺</span> Reiniciar
+                </button>
+              </div>
+              <p class="formal-note">A entrada permanece habilitada em q30+ para demonstrar os laços do AFD.</p>
             </div>
-            <div class="coin-grid">
-              <button class="coin-button coin-five" type="button" data-coin="5" aria-label="Inserir moeda de 5 centavos">
-                <span class="coin-symbol">05</span>
-                <span class="coin-caption">centavos</span>
-              </button>
-              <button class="coin-button coin-ten" type="button" data-coin="10" aria-label="Inserir moeda de 10 centavos">
-                <span class="coin-symbol">10</span>
-                <span class="coin-caption">centavos</span>
-              </button>
-              <button class="coin-button coin-twenty-five" type="button" data-coin="25" aria-label="Inserir moeda de 25 centavos">
-                <span class="coin-symbol">25</span>
-                <span class="coin-caption">centavos</span>
-              </button>
+          </div>
+
+          <div class="delivery-tray" id="delivery-tray" aria-live="polite">
+            <div class="tray-opening" aria-hidden="true"><span></span></div>
+            <div class="tray-message">
+              <span class="tray-label">Compartimento de entrega</span>
+              <strong id="delivery-message">Aguardando crédito</strong>
             </div>
-            <div class="action-row">
-              <button class="finish-button" id="finish-button" type="button">
-                <span aria-hidden="true">◎</span> Concluir palavra
-              </button>
-              <button class="reset-button" id="reset-button" type="button">
-                <span aria-hidden="true">↺</span> Reiniciar
-              </button>
-            </div>
-            <p class="formal-note">Depois de q30+, as moedas continuam habilitadas para demonstrar os laços do AFD.</p>
           </div>
         </article>
 
         <article class="panel diagram-panel">
           <div class="panel-heading">
             <div>
-              <p class="panel-kicker">mapa de estados</p>
-              <h2>Veja o autômato se mover</h2>
+              <p class="panel-kicker">por trás da máquina</p>
+              <h2>Como a máquina decide</h2>
             </div>
             <span class="panel-index">02</span>
           </div>
@@ -198,7 +234,7 @@
 
       <footer class="footer">
         <span>LFA / Trabalho 01</span>
-        <span>modelo local · sem publicação</span>
+        <span>AFD interativo · modelo educacional</span>
       </footer>
     </main>
 

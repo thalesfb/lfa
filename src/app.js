@@ -17,6 +17,8 @@ const stateDescription = document.querySelector("#state-description");
 const creditValue = document.querySelector("#credit-value");
 const progressBar = document.querySelector("#progress-bar");
 const screenNote = document.querySelector("#screen-note");
+const vendingMachine = document.querySelector("#purchase-panel");
+const deliveryMessage = document.querySelector("#delivery-message");
 const inputTape = document.querySelector("#input-tape");
 const historyBody = document.querySelector("#history-body");
 const transitionBody = document.querySelector("#transition-body");
@@ -128,7 +130,9 @@ const renderDiagram = () => {
 
 const renderStatus = () => {
   const accepted = machine.accepted;
-  machineStatus.dataset.status = wordClosed ? (accepted ? "accepted" : "rejected") : accepted ? "accepted" : "waiting";
+  const status = wordClosed ? (accepted ? "accepted" : "rejected") : accepted ? "accepted" : "waiting";
+  machineStatus.dataset.status = status;
+  vendingMachine.dataset.status = status;
   statusText.textContent = wordClosed
     ? accepted ? "Palavra aceita" : "Palavra rejeitada"
     : accepted ? "Estado final alcançado" : "Processando palavra";
@@ -144,6 +148,9 @@ const renderStatus = () => {
     : accepted
       ? "Estado final alcançado. Você pode observar os laços absorventes antes de concluir."
       : `Prefixo em processamento. Faltam ${formatCurrency(Math.max(PRICE_CENTS - machine.credit, 0))} para alcançar q30+.`;
+  deliveryMessage.textContent = wordClosed
+    ? accepted ? "Produto liberado — retire aqui" : "Crédito insuficiente"
+    : accepted ? "Crédito suficiente — conclua a compra" : "Aguardando crédito";
 
   coinButtons.forEach((button) => {
     button.disabled = wordClosed;
