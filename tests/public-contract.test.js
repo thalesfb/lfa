@@ -23,17 +23,23 @@ test("a interface pública apresenta os elementos essenciais de uma máquina de 
   }
 
   assert.match(html, /Máquina de vendas/i);
-  assert.match(html, /Como a máquina decide/i);
-  assert.match(html, /caminho percorrido/i);
+  assert.match(html, /Estados de crédito e retirada/i);
+  assert.match(html, /Escala de saldos.*tabela abaixo.*δ completa.*última transição/i);
+  assert.match(html, /Histórico de transições/i);
   assert.match(html, /id="diagram-reading-guide"/);
   assert.match(html, /id="diagram-mobile-fallback"/);
   assert.match(html, /id="mobile-transition-body"/);
-  assert.match(html, /viewBox="0 0 1080 430"/);
+  assert.match(html, /viewBox="0 0 1080 250"/);
+  assert.match(html, /AFD de crédito acumulado e retirada/i);
+  assert.match(html, /q30\+20/);
+  assert.match(html, /q30\+ → q0/);
+  assert.doesNotMatch(html, /Máquina de Mealy|id="finish-button"/i);
   for (const marker of [
     'id="transition-example-q0-5"',
     'id="transition-example-q0-10"',
     'id="transition-example-q0-25"',
-    'id="transition-example-q15-10"',
+    'id="transition-example-q25-10"',
+    'id="transition-example-q25-25"',
   ]) {
     assert.match(html, new RegExp(marker.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&")), `exemplo ausente: ${marker}`);
   }

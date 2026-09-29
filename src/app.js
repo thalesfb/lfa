@@ -1,5 +1,6 @@
 import {
   applyCoin,
+  collectProduct as collectMachineProduct,
   createInitialMachine,
 } from "./automaton.js";
 import { getElements } from "./dom.js";
@@ -10,8 +11,7 @@ const elements = getElements();
 let uiState = {
   machine: createInitialMachine(),
   lastEvent: null,
-  wordClosed: false,
-  finishAttempted: false,
+  productReady: false,
 };
 
 const render = () => {
@@ -19,7 +19,7 @@ const render = () => {
 };
 
 const setMachineFromCoin = (button) => {
-  if (uiState.wordClosed) {
+  if (uiState.productReady) {
     return;
   }
 
@@ -28,7 +28,7 @@ const setMachineFromCoin = (button) => {
     ...uiState,
     machine,
     lastEvent: machine.history.at(-1),
-    finishAttempted: false,
+    productReady: machine.productReady,
   };
 
   button.classList.remove("is-pressed");
@@ -37,11 +37,17 @@ const setMachineFromCoin = (button) => {
   render();
 };
 
-const finishPurchase = () => {
+const collectProductFromTray = () => {
+  if (!uiState.productReady) {
+    return;
+  }
+
+  const machine = collectMachineProduct(uiState.machine);
   uiState = {
     ...uiState,
-    finishAttempted: true,
-    wordClosed: uiState.machine.accepted,
+    machine,
+    lastEvent: machine.history.at(-1),
+    productReady: machine.productReady,
   };
   render();
 };
@@ -50,8 +56,7 @@ const resetMachine = () => {
   uiState = {
     machine: createInitialMachine(),
     lastEvent: null,
-    wordClosed: false,
-    finishAttempted: false,
+    productReady: false,
   };
   render();
 };
@@ -60,8 +65,7 @@ elements.coinButtons.forEach((button) => {
   button.addEventListener("click", () => setMachineFromCoin(button));
 });
 
-elements.finishButton.addEventListener("click", finishPurchase);
 elements.resetButton.addEventListener("click", resetMachine);
-elements.collectButton.addEventListener("click", resetMachine);
+elements.collectButton.addEventListener("click", collectProductFromTray);
 
 render();
