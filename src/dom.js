@@ -32,7 +32,6 @@ export const getElements = (root) => {
     diagramCallout: requiredElement(scope, "#diagram-callout"),
     transitionAnnouncement: requiredElement(scope, "#transition-announcement"),
     coinButtons: [...scope.querySelectorAll("[data-coin]")],
-    finishButton: requiredElement(scope, "#finish-button"),
     resetButton: requiredElement(scope, "#reset-button"),
   });
 };

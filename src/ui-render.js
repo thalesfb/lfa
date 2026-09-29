@@ -1,4 +1,12 @@
-import { COINS, PRICE_CENTS, STATES, describeState, transition } from "./automaton.js";
+import {
+  COLLECT_INPUT,
+  INPUT_SYMBOLS,
+  PRICE_CENTS,
+  REJECT_STATE,
+  STATES,
+  describeState,
+  evaluateTransition,
+} from "./automaton.js";
 import { renderDiagram } from "./diagram.js";
 import { getStatusCopy } from "./ui-copy.js";
 
@@ -7,13 +15,16 @@ export const formatCurrency = (cents) => (cents / 100).toLocaleString("pt-BR", {
   currency: "BRL",
 }).replace(/\u00a0/g, " ");
 
-export const renderMachineStatus = ({ elements, machine, wordClosed, finishAttempted }) => {
+export const renderMachineStatus = ({ elements, machine, productReady, lastEvent }) => {
   const copy = getStatusCopy({
     inputLength: machine.input.length,
-    accepted: machine.accepted,
-    wordClosed,
-    finishAttempted,
+    state: machine.state,
+    credit: machine.credit,
+    creditLabel: formatCurrency(machine.credit),
     missingLabel: formatCurrency(Math.max(PRICE_CENTS - machine.credit, 0)),
+    afterProductLabel: formatCurrency(Math.max(machine.credit - PRICE_CENTS, 0)),
+    productReady,
+    lastEvent,
   });
 
   elements.machineStatus.dataset.status = copy.pillStatus;
@@ -28,10 +39,9 @@ export const renderMachineStatus = ({ elements, machine, wordClosed, finishAttem
   elements.deliveryMessage.textContent = copy.deliveryMessage;
 
   elements.coinButtons.forEach((button) => {
-    button.disabled = wordClosed;
+    button.disabled = productReady;
   });
-  elements.finishButton.disabled = wordClosed;
-  elements.collectButton.hidden = !(wordClosed && machine.accepted);
+  elements.collectButton.hidden = !productReady;
 };
 
 export const renderInputTape = (element, input) => {
@@ -40,12 +50,17 @@ export const renderInputTape = (element, input) => {
     return;
   }
 
-  element.innerHTML = input.map((coin, index) => `
-    <span class="tape-token ${index === input.length - 1 ? "is-latest" : ""}">
-      <strong>${coin}</strong><small>¢</small>
-    </span>
-    ${index < input.length - 1 ? '<span class="tape-separator">→</span>' : ""}
-  `).join("");
+  element.innerHTML = input.map((symbol, index) => {
+    const isCollection = symbol === COLLECT_INPUT;
+    const content = isCollection
+      ? '<strong>R</strong><small>retirada</small>'
+      : `<strong>${symbol}</strong><small>¢</small>`;
+
+    return `
+      <span class="tape-token ${index === input.length - 1 ? "is-latest" : ""}">${content}</span>
+      ${index < input.length - 1 ? '<span class="tape-separator">→</span>' : ""}
+    `;
+  }).join("");
 };
 
 export const renderHistory = (element, history) => {
@@ -54,22 +69,47 @@ export const renderHistory = (element, history) => {
     return;
   }
 
-  element.innerHTML = history.map((event, index) => `
-    <tr class="${index === history.length - 1 ? "is-latest" : ""}">
-      <td>${String(index + 1).padStart(2, "0")}</td>
-      <td><span class="table-coin">${event.coin}¢</span></td>
-      <td><code>${event.from}</code></td>
-      <td><code>${event.to}</code></td>
-      <td>${formatCurrency(event.credit)}</td>
-    </tr>
-  `).join("");
+  element.innerHTML = history.map((event, index) => {
+    const isCollection = event.action === "collect-product";
+    const inputLabel = isCollection ? "R · retirar" : `${event.coin}¢`;
+    const stepLabel = isCollection
+      ? `Produto retirado · saldo ${formatCurrency(event.credit)}`
+      : event.productReady
+        ? `Produto disponível · saldo ${formatCurrency(event.credit)}`
+        : `Crédito ${formatCurrency(event.credit)}`;
+
+    return `
+      <tr class="${index === history.length - 1 ? "is-latest" : ""}">
+        <td>${String(index + 1).padStart(2, "0")}</td>
+        <td><span class="table-coin">${inputLabel}</span></td>
+        <td><code>${event.from}</code></td>
+        <td><code>${event.to}</code></td>
+        <td>${stepLabel}</td>
+      </tr>
+    `;
+  }).join("");
+};
+
+const transitionDescription = (input, result) => {
+  if (result.nextState === REJECT_STATE) {
+    return "inválido";
+  }
+
+  if (input === COLLECT_INPUT) {
+    return "retirada";
+  }
+
+  return result.productReady ? "produto disponível" : "crédito";
 };
 
 export const renderTransitionTable = (elements, currentState) => {
   const rows = STATES.map((state) => `
     <tr class="${state === currentState ? "is-current" : ""}">
       <th scope="row"><code>${state}</code></th>
-      ${COINS.map((coin) => `<td>${transition(state, coin)}</td>`).join("")}
+      ${INPUT_SYMBOLS.map((input) => {
+        const result = evaluateTransition(state, input);
+        return `<td><code>${result.nextState}</code><small>${transitionDescription(input, result)}</small></td>`;
+      }).join("")}
     </tr>
   `).join("");
 
@@ -77,22 +117,41 @@ export const renderTransitionTable = (elements, currentState) => {
   elements.mobileTransitionBody.innerHTML = rows;
 };
 
+const eventDescription = (event) => {
+  if (event.action === "collect-product") {
+    return `Retirada desconta 30 centavos; ${formatCurrency(event.credit)} continuam como saldo.`;
+  }
+
+  if (event.productReady) {
+    return `Produto disponível. A retirada desconta 30 centavos; ${formatCurrency(event.credit - PRICE_CENTS)} permanecem.`;
+  }
+
+  return `${formatCurrency(event.credit)} acumulados; produto ainda indisponível.`;
+};
+
 export const renderCallout = (elements, lastEvent) => {
   if (!lastEvent) {
-    elements.diagramCallout.innerHTML = '<span class="callout-arrow">↳</span><span>Escolha uma moeda para destacar a próxima transição.</span>';
+    elements.diagramCallout.innerHTML = '<span class="callout-label">Última transição</span><span>Insira uma moeda ou retire o produto disponível para acompanhar a mudança de estado.</span>';
     elements.transitionAnnouncement.textContent = "Nenhuma transição executada ainda.";
     return;
   }
 
+  const inputLabel = lastEvent.action === "collect-product"
+    ? "retirada R"
+    : `moeda ${lastEvent.coin}¢`;
+  const description = eventDescription(lastEvent);
+
   elements.diagramCallout.innerHTML = `
-    <span class="callout-arrow">↳</span>
-    <span><strong>${lastEvent.from}</strong> + <strong>${lastEvent.coin}¢</strong> → <strong>${lastEvent.to}</strong></span>
+    <span class="callout-label">Última transição</span>
+    <span><strong>${lastEvent.from}</strong> + <strong>${inputLabel}</strong> → <strong>${lastEvent.to}</strong>
+      <small>${description}</small>
+    </span>
   `;
-  elements.transitionAnnouncement.textContent = `Transição: ${lastEvent.from} mais ${lastEvent.coin} centavos para ${lastEvent.to}.`;
+  elements.transitionAnnouncement.textContent = `Transição: ${lastEvent.from}, ${inputLabel}, ${lastEvent.to}. ${description}`;
 };
 
-export const renderInterface = ({ elements, machine, lastEvent, wordClosed, finishAttempted }) => {
-  renderMachineStatus({ elements, machine, wordClosed, finishAttempted });
+export const renderInterface = ({ elements, machine, lastEvent, productReady }) => {
+  renderMachineStatus({ elements, machine, lastEvent, productReady });
   renderInputTape(elements.inputTape, machine.input);
   renderHistory(elements.historyBody, machine.history);
   renderTransitionTable(elements, machine.state);

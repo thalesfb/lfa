@@ -1,203 +1,101 @@
 # VEND-30 — Trabalho 01 de LFA
 
-Simulador web de uma máquina de vendas modelada como um **autômato finito determinístico
-(AFD) reconhecedor**.
+Simulador de uma máquina de vendas representada por um **AFD**. O produto custa 30 centavos;
+a máquina aceita moedas de 5, 10 e 25 centavos e conserva o excedente para a compra seguinte.
 
 [![CI](https://github.com/thalesfb/lfa/actions/workflows/ci.yml/badge.svg)](https://github.com/thalesfb/lfa/actions/workflows/ci.yml)
 [![Deploy GitHub Pages](https://github.com/thalesfb/lfa/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/thalesfb/lfa/actions/workflows/deploy-pages.yml)
 [![Demonstração](https://img.shields.io/badge/demo-GitHub%20Pages-0f766e?style=flat-square&logo=github)](https://thalesfb.github.io/lfa/)
 [![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-f0b429?style=flat-square)](LICENSE)
 
-Este repositório é, neste momento, exclusivo do Trabalho 01 de Linguagens Formais e
-Autômatos. A interface usa a metáfora de uma máquina de vendas, mas o objeto formal do
-trabalho é um **autômato finito determinístico (AFD) reconhecedor**.
+## Regra de crédito e retirada
 
-## Objetivo e limite do trabalho
+As moedas são aceitas enquanto o crédito é menor que 30 centavos. Ao atingir ou ultrapassar
+30 centavos, a máquina habilita a retirada e pausa a entrada de moedas. Retirar o produto
+desconta 30 centavos do saldo atual.
 
-A VEND-30 reconhece palavras formadas por moedas de 5, 10 e 25 centavos. O produto custa
-30 centavos e uma palavra é aceita quando a soma chega a pelo menos esse valor:
+O saldo antes da retirada não passa de 50 centavos: o saldo anterior é menor que 30 e a moeda
+de maior valor é 25. Portanto, não existe saldo de 60 centavos nesta máquina.
 
 ```text
-L = { w ∈ {5, 10, 25}* | soma(w) ≥ 30 }
+10 + 10 + 10 = 30: q30+  --R--> q0
+25 + 10 = 35:     q30+5 --R--> q5
+25 + 25 = 50:     q30+20 --R--> q20
 ```
 
-O artigo usado como motivação apresenta uma máquina de vendas mais completa, modelada como
-uma **Máquina de Mealy**, com seleção de produtos, estoque, troco e símbolos de saída. Esses
-elementos não fazem parte deste recorte: a implementação abaixo demonstra a função de
-transição `δ` e a aceitação de palavras, sem transformar o trabalho em uma Máquina de Mealy.
+`q30+` inicia a faixa de estados com produto disponível. Ela contém cinco estados distintos:
+`q30+`, `q30+5`, `q30+10`, `q30+15` e `q30+20`. O sufixo registra o excedente sobre o preço.
+Esses estados não podem ser fundidos em um único estado `q30+`: a retirada deve levar saldos
+diferentes a destinos diferentes, como `q30+` para `q0` e `q30+20` para `q20`.
 
-Se o projeto crescer no futuro para abranger o artigo completo, a documentação específica
-de cada novo escopo deverá ser separada. Por enquanto, toda a explicação necessária para
-este trabalho fica aqui no README.
+## Modelo formal
 
-## Validação formal contra o Trabalho 01
-
-O modelo implementado é a 5-tupla:
+O modelo é um AFD completo `M = (Q, Σ, δ, q0, F)`:
 
 ```text
-M = (Q, Σ, δ, q0, F)
-Σ = {5, 10, 25}
-Q = {q0, q5, q10, q15, q20, q25, q30+}
+Q = {q0, q5, q10, q15, q20, q25,
+     q30+, q30+5, q30+10, q30+15, q30+20, q_rej}
+Σ = {5, 10, 25, R}
 q0 = estado inicial
-F = {q30+}
-δ: Q × Σ → Q
+F = {q30+, q30+5, q30+10, q30+15, q30+20}
 ```
 
-Isso mantém o trabalho dentro da definição de AFD:
+`R` significa retirar o produto. Os estados de `F` indicam que o produto está disponível. Em
+estados abaixo de 30 centavos, `δ` soma a moeda ao crédito. Ao entrar em `F`, novos depósitos
+são bloqueados até `R`; então `δ` desconta 30 centavos e retorna ao estado do saldo restante.
+Entradas incompatíveis levam a `q_rej`, que possui laços para todo símbolo de `Σ`.
 
-- `Q` é finito e todos os sete estados são alcançáveis;
-- `Σ` contém somente as três moedas permitidas;
-- para cada estado e cada moeda existe exatamente um próximo estado;
-- `δ` é determinística e total para `Σ`, resultando em 7 × 3 = 21 transições;
-- a palavra só é aceita quando termina em `q30+`;
-- o arquivo JFLAP usa `<type>fa</type>`, possui `q0` como inicial e `q30+` como final;
-- não existe função de saída `λ`, estoque, troco ou seleção formal de produto.
+O AFD tem 12 estados e 48 transições. A interface deriva “produto disponível” do estado atual;
+não usa função de saída `λ`, pilha ou crédito ilimitado.
 
-### Tabela completa de transições
+### Transições de retirada
 
-| Estado | 5¢ | 10¢ | 25¢ |
-| --- | --- | --- | --- |
-| `q0` | `q5` | `q10` | `q25` |
-| `q5` | `q10` | `q15` | `q30+` |
-| `q10` | `q15` | `q20` | `q30+` |
-| `q15` | `q20` | `q25` | `q30+` |
-| `q20` | `q25` | `q30+` | `q30+` |
-| `q25` | `q30+` | `q30+` | `q30+` |
-| `q30+` | `q30+` | `q30+` | `q30+` |
+| Estado atual | Entrada `R` | Saldo após retirada |
+| --- | --- | --- |
+| `q30+` | `q0` | 0¢ |
+| `q30+5` | `q5` | 5¢ |
+| `q30+10` | `q10` | 10¢ |
+| `q30+15` | `q15` | 15¢ |
+| `q30+20` | `q20` | 20¢ |
 
-Assim, as três transições que saem do estado inicial são:
+O arquivo [`vending-machine.jff`](vending-machine.jff) contém o mesmo AFD no formato JFLAP.
+O gerador [`scripts/generate-jflap.mjs`](scripts/generate-jflap.mjs) constrói o arquivo a partir
+da tabela executada pelo código.
 
-```text
-q0 + 5¢  → q5
-q0 + 10¢ → q10
-q0 + 25¢ → q25
-```
+## Interface
 
-`q30+` representa a classe de todos os créditos maiores ou iguais a 30; não significa
-exatamente 30 centavos. Por isso ele é um estado final absorvente:
+- Os botões representam as entradas de moedas; `R` é o botão “Retirar produto”.
+- O visor mostra o saldo exato. Na faixa `q30+`, também mostra quanto restará após a retirada.
+- Quando o produto fica disponível, moedas são bloqueadas até a retirada.
+- A fita e o histórico registram moedas, retiradas e cada mudança de estado.
+- Reiniciar devolve a máquina a `q0`.
 
-```text
-δ(q30+, 5) = δ(q30+, 10) = δ(q30+, 25) = q30+
-```
+## Organização do código
 
-O estado formal e o crédito operacional são mantidos separadamente: `machine.state` pode
-ser `q30+`, enquanto `machine.credit` exibe R$ 0,35 ou R$ 0,50. Isso preserva a finitude do
-AFD sem esconder o valor real inserido.
+- [`src/automaton.js`](src/automaton.js) define os estados e a função de transição `δ`;
+- [`src/app.js`](src/app.js) conecta moedas e retirada à máquina;
+- [`src/ui-render.js`](src/ui-render.js) mostra saldo, estados, tabela e histórico;
+- [`src/diagram.js`](src/diagram.js) desenha a faixa de estados e destaca a última transição;
+- [`src/ui-copy.js`](src/ui-copy.js) contém as mensagens da interface;
+- [`vending-machine.jff`](vending-machine.jff) abre o modelo no JFLAP.
 
-## Funcionamento programático
+## Desenvolvimento e validação
 
-O caminho de uma moeda pelo programa é:
-
-```text
-clique na moeda
-  → applyCoin(machine, coin)
-  → transition(machine.state, coin)
-  → atualiza estado, crédito e histórico
-  → render() atualiza a interface
-```
-
-- [`src/automaton.js`](src/automaton.js) define `Q`, `Σ`, `δ`, a aceitação e o estado da
-  simulação;
-- [`src/dom.js`](src/dom.js) concentra a localização dos elementos obrigatórios da página;
-- [`src/ui-render.js`](src/ui-render.js) renderiza visor, fita, histórico, tabela e mensagens,
-  sem controlar eventos;
-- [`src/diagram.js`](src/diagram.js) agrupa transições e desenha o SVG do diagrama; ele não
-  altera `δ`;
-- [`src/app.js`](src/app.js) mantém o estado da interação e conecta os eventos à renderização;
-- [`vending-machine.jff`](vending-machine.jff) contém as mesmas 21 transições para o JFLAP.
-
-“Liberar produto” é uma ação da interface que consulta se o estado alcançado é final; não é
-uma transição extra do AFD. Se o crédito for insuficiente, a tentativa é comunicada como
-rejeitada, mas a entrada continua aberta para que o usuário possa inserir outras moedas.
-
-## Como a interface demonstra o modelo
-
-- os botões representam os símbolos de `Σ`;
-- o estado atual, a fita e o histórico mostram a execução de `δ` passo a passo;
-- o diagrama apresenta os estados e as arestas; o caminho já percorrido permanece marcado e
-  a última transição recebe destaque mais forte;
-- a guia “Como ler as setas” explicita os três caminhos que saem de `q0`;
-- em telas estreitas, uma tabela de transições substitui o SVG reduzido para preservar a
-  legibilidade sem barra horizontal;
-- a tabela completa abaixo do simulador permite conferir toda a função `δ`.
-
-## Desenvolvimento e entrega
-
-É necessário ter Node.js instalado.
-
-### Teste local
-
-O servidor local serve somente para visualizar e testar a aplicação durante o desenvolvimento.
-Ele não representa a URL oficial da entrega.
+Requer Node.js.
 
 ```powershell
 npm test
+node scripts/generate-jflap.mjs
 python -m http.server 4173
 ```
 
-Acesse <http://localhost:4173> apenas como pré-visualização local.
+Abra <http://localhost:4173> para visualizar a aplicação local. A demonstração publicada fica
+em <https://thalesfb.github.io/lfa/>.
 
-### Demonstração publicada
+Os testes cobrem as 48 transições, o teto de 50 centavos, os três casos de retirada, a rejeição
+de moedas enquanto o produto aguarda retirada e a equivalência entre código e arquivo JFLAP.
 
-A interface oficial é publicada automaticamente pelo workflow do GitHub Pages após uma
-alteração na branch de entrega. Acesse:
+## Referências
 
-<https://thalesfb.github.io/lfa/>
-
-O workflow executa `npm test` antes de gerar o artefato estático. Se os testes falharem, a
-publicação não deve avançar.
-
-### Roteiro manual
-
-1. Confirme o estado inicial `q0` e o crédito R$ 0,00.
-2. Insira 10¢ e observe `q0 → q10`.
-3. Insira 25¢ e observe `q10 → q30+`, com crédito real de R$ 0,35.
-4. Insira outra moeda em `q30+` e observe o laço absorvente.
-5. Tente liberar com apenas 10¢: a mensagem deve indicar rejeição, mas os botões continuam habilitados.
-6. Complete a palavra com 25¢ e retire o produto.
-7. Consulte a tabela completa e compare-a com o arquivo JFLAP.
-
-## Testes automatizados
-
-`npm test` verifica:
-
-- contrato do trabalho e estado inicial;
-- as 21 combinações da tabela de transições;
-- aceitação exata, excesso de crédito e rejeição;
-- laços absorventes em `q30+` mantendo o crédito real;
-- determinismo, estados inicial/final e unicidade das transições no JFLAP;
-- mensagens da interface, contrato público e layout responsivo.
-
-## Referências e embasamento
-
-### Artigo-base
-
-- [Bonifácio e Costa — Modelagem de uma Vending Machine utilizando um Autômato Finito com Saída (PDF)](https://www.din.uem.br/yandre/TC/artigo-vending-machine.pdf)
-- [UEM — materiais de Teoria da Computação](https://www.din.uem.br/~yandre/tc.htm)
-
-O artigo é usado para comparar AFD reconhecedor e Máquina de Mealy. A VEND-30 não afirma
-reproduzir o artigo completo: ela implementa apenas o recorte formal exigido para este
-trabalho.
-
-### Fundamentos de AFD e linguagens regulares
-
-- [Cornell — DFA introduction](https://www.cs.cornell.edu/courses/cs2800/2017fa/lectures/lec21-dfa.html)
-- [MIT OpenCourseWare — Automata, Computability, and Complexity](https://ocw.mit.edu/courses/6-045j-automata-computability-and-complexity-spring-2011/)
-- [MIT — Lecture 3: deterministic finite automata (PDF)](https://ocw.mit.edu/courses/6-045j-automata-computability-and-complexity-spring-2011/a8b9bb8d5d9c1f7a6b4a85056b8dcbde_MIT6_045JS11_lec03.pdf)
-- [Shallit — Finite automata and regular languages](https://www.cambridge.org/core/books/abs/second-course-in-formal-languages-and-automata-theory/finite-automata-and-regular-languages/F193C87118322C9202FB00B11125CF1C), DOI [10.1017/CBO9780511808876.004](https://doi.org/10.1017/CBO9780511808876.004)
-- [Cornell — DFA minimization e Myhill–Nerode](https://courses.cs.cornell.edu/cs4120/2023sp/notes/leximpl/index.html)
-- Hopcroft, Motwani e Ullman, [Introduction to Automata Theory, Languages, and Computation](https://www.pearson.com/en-us/subject-catalog/p/introduction-to-automata-theory-languages-and-computation/P200000003517/9780321455369)
-
-### Ferramentas e autômatos com saída
-
-- [JFLAP — livro oficial](https://jflap.org/jflapbook/jflapbook2006.pdf)
-- [JFLAP — tutorial de autômatos finitos](https://jflap.org/tutorial/fa/createfa/fa.html)
-- [UFMG — autômato finito com saída](https://homepages.dcc.ufmg.br/~loureiro/md/md_6Funcoes.pdf)
-
-### Perguntas para continuar estudando
-
-1. Por que o conjunto de estados precisa ser finito mesmo que o crédito real possa crescer?
-2. Qual é a diferença entre uma palavra ser aceita e uma máquina liberar um produto?
-3. O que se perde ao trocar a Máquina de Mealy do artigo por um AFD reconhecedor?
-4. Se o preço mudar para 35 centavos, quais estados e transições precisam ser alterados?
-5. O AFD poderia ser minimizado sem mudar a linguagem reconhecida?
+- [Bonifácio e Costa — Modelagem de uma Vending Machine utilizando um Autômato Finito com Saída](https://www.din.uem.br/~yandre/TC/artigo-vending-machine.pdf)
+- [JFLAP — Tutorial de autômatos finitos](https://jflap.org/csed/jflap/tutorial/fa/fa.html)
