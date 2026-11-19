@@ -95,6 +95,13 @@ em <https://thalesfb.github.io/lfa/>.
 Os testes cobrem as 48 transições, o teto de 50 centavos, os três casos de retirada, a rejeição
 de moedas enquanto o produto aguarda retirada e a equivalência entre código e arquivo JFLAP.
 
+## Trabalhos de LFA
+
+| Trabalho | Repositório e demonstração | PRs e papéis |
+| --- | --- | --- |
+| Trabalho 1 — VEND-30 | [thalesfb/lfa](https://github.com/thalesfb/lfa) · [GitHub Pages](https://thalesfb.github.io/lfa/) | AFD de máquina de vendas com retirada e conservação do troco. |
+| Trabalho 2 — Operação Cofre LIFO | [everton2803/LFA-JogoPDA](https://github.com/everton2803/LFA-JogoPDA) · [GitHub Pages](https://everton2803.github.io/LFA-JogoPDA/) | [PR #1](https://github.com/everton2803/LFA-JogoPDA/pull/1) (merged): motor, testes e CI<br>[PR #2](https://github.com/everton2803/LFA-JogoPDA/pull/2) (draft): duas credenciais<br>[PR #3](https://github.com/everton2803/LFA-JogoPDA/pull/3) (draft): controles e acessibilidade<br>Papéis acordados: `thalesfb` — motor/testes/CI e credenciais; `everton2803` — controles; documentação — dupla. |
+
 ## Referências
 
 - [Bonifácio e Costa — Modelagem de uma Vending Machine utilizando um Autômato Finito com Saída](https://www.din.uem.br/~yandre/TC/artigo-vending-machine.pdf)
